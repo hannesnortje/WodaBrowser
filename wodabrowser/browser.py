@@ -54,7 +54,7 @@ from PyQt6.QtCore import (
     QMutex,
     QWaitCondition
 )
-from PyQt6.QtGui import QAction, QCursor, QTextDocument, QIcon
+from PyQt6.QtGui import QAction, QCursor, QTextDocument, QIcon, QPixmap
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -261,7 +261,14 @@ class Browser(QMainWindow):
         # Set application icon
         icon_path = os.path.join(os.path.dirname(__file__), "icons", "wodabrowser.svg")
         if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
+            pixmap = QPixmap(icon_path)
+            if not pixmap.isNull():
+                icon = QIcon(pixmap)
+                self.setWindowIcon(icon)
+            else:
+                print(f"Error: Could not load icon from {icon_path}")
+        else:
+            print(f"Error: Icon file not found at {icon_path}")
 
         # Load QWebChannel JavaScript code from file
         qwebchannel_js_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "qwebchannel.js")
