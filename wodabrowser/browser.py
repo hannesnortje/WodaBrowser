@@ -257,6 +257,11 @@ class BrowserTab(QWidget):
 class Browser(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
+        
+        # Set application icon
+        icon_path = os.path.join(os.path.dirname(__file__), "icons", "wodabrowser.svg")
+        if os.path.exists(icon_path):
+            self.setWindowIcon(QIcon(icon_path))
 
         # Load QWebChannel JavaScript code from file
         qwebchannel_js_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "qwebchannel.js")

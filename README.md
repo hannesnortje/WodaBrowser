@@ -21,6 +21,34 @@ The Woda Browser is a custom-built browser leveraging PyQt6, designed for enhanc
 
 ## Installation
 
+### Quick Install
+Install directly from GitHub using pipx:
+```bash
+pipx install git+https://github.com/hannesnortje/WodaBrowser.git
+```
+
+### Development Install
+For development or to modify the source:
+```bash
+# Clone the repository
+git clone https://github.com/hannesnortje/WodaBrowser.git
+cd WodaBrowser
+
+# Install in development mode
+pipx install -e .
+```
+
+### Updating
+To update to the latest version:
+```bash
+pipx upgrade wodabrowser
+```
+
+Or force reinstall:
+```bash
+pipx install --force git+https://github.com/hannesnortje/WodaBrowser.git
+```
+
 ### Install Python 3
 
 If Python 3 is not installed, follow the instructions below for your operating system.
@@ -109,22 +137,6 @@ With Python 3 installed, install `pipx` to handle isolated installations of Pyth
    ```
 
 2. **Restart the terminal** after installation.
-
----
-
-### Install Woda Browser
-
-With `pipx` installed, you can now install the Woda Browser. This will install it in an isolated environment, keeping dependencies separated from other applications.
-
-```bash
-pipx install git+https://github.com/hannesnortje/WodaBrowser.git
-```
-
-If you already have a previous version of Woda Browser installed, add `--force` to overwrite the installation:
-
-```bash
-pipx install --force git+https://github.com/hannesnortje/WodaBrowser.git
-```
 
 ---
 

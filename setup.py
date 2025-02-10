@@ -1,4 +1,19 @@
 from setuptools import setup, find_packages
+import os
+import platform
+import sys
+
+def get_data_files():
+    data_files = []
+    
+    # Linux-specific files
+    if platform.system() == "Linux":
+        data_files.extend([
+            ('share/applications', ['wodabrowser/icons/wodabrowser.desktop']),
+            ('share/icons/hicolor/scalable/apps', ['wodabrowser/icons/wodabrowser.svg']),
+        ])
+    
+    return data_files
 
 setup(
     name="wodabrowser",
@@ -16,8 +31,15 @@ setup(
     },
     include_package_data=True,
     package_data={
-        "wodabrowser": ["js/*.js", "github-mark.svg"],
+        "wodabrowser": [
+            "js/*.js",
+            "github-mark.svg",
+            "icons/*.*",
+            "icons/wodabrowser.iconset/*",
+        ],
     },
+    data_files=get_data_files(),
+    zip_safe=False,  # Required for PyQt6 applications
     python_requires=">=3.8",
     author="Hannes Nortjé",
     description="A PyQt6-based web browser",

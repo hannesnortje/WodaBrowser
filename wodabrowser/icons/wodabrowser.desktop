@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Woda Browser
+Comment=Web Browser with JavaScript injection capabilities
+Exec=wodabrowser
+Icon=wodabrowser
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;
