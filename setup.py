@@ -12,13 +12,13 @@ def get_data_files():
         data_files.append(('share/applications', ['wodabrowser/icons/wodabrowser.desktop']))
         
         # Install icons in multiple sizes
-        icon_sizes = ['16', '24', '32', '48', '64', '128', '256']
+        icon_sizes = ['16', '24', '32', '48', '64', '128', '256', 'scalable']
         for size in icon_sizes:
-            size_path = f'share/icons/hicolor/{size}x{size}/apps'
+            if size == 'scalable':
+                size_path = f'share/icons/hicolor/{size}/apps'
+            else:
+                size_path = f'share/icons/hicolor/{size}x{size}/apps'
             data_files.append((size_path, ['wodabrowser/icons/wodabrowser.svg']))
-        
-        # Install scalable icon
-        data_files.append(('share/icons/hicolor/scalable/apps', ['wodabrowser/icons/wodabrowser.svg']))
     
     return data_files
 
