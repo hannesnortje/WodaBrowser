@@ -52,7 +52,8 @@ from PyQt6.QtCore import (
     QThreadPool,
     QTimer,
     QMutex,
-    QWaitCondition
+    QWaitCondition,
+    QByteArray
 )
 from PyQt6.QtGui import QAction, QCursor, QTextDocument, QIcon, QPixmap
 from PyQt6.QtWidgets import (
@@ -81,13 +82,14 @@ try:
 except ImportError:
     from file_system_handler import FileSystemHandler
 from functools import partial
+from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineDownloadRequest
 
 # Constants
 MAX_HISTORY_LENGTH = 100
-DEFAULT_URL = "https://google.com"
-BROWSER_TITLE = "Web4x Browser"
+DEFAULT_URL = "https://test.wo-da.de/ide"
+BROWSER_TITLE = "Woda Browser"
 SETTINGS_ORG = "CeruleanCircle"
-SETTINGS_APP = "Web4xBrowser"
+SETTINGS_APP = "WodaBrowser"
 
 
 class DraggableTabWidget(QTabWidget):
@@ -127,8 +129,35 @@ class CodeExecutor(QObject):
 
     @pyqtSlot(QVariant)
     def executeSignal(self, incoming):
-        print(f"Received from JavaScript: {incoming}")
-        self.codeResultReady.emit(incoming)
+        if isinstance(incoming, dict):
+            if incoming.get('type') == 'downloadPDF':
+                self.handle_pdf_download(incoming.get('filename', ''), incoming.get('data', ''))
+            else:
+                print(f"Received unknown type from JavaScript: {incoming}")
+        else:
+            print(f"Received from JavaScript: {incoming}")
+
+    def handle_pdf_download(self, filename, data_uri):
+        try:
+            # Remove the data URI prefix to get the base64 data
+            base64_data = data_uri.split(',')[1]
+            pdf_data = QByteArray.fromBase64(base64_data.encode())
+
+            # Open file dialog
+            file_path, _ = QFileDialog.getSaveFileName(
+                None,
+                "Save PDF",
+                filename,
+                "PDF Files (*.pdf);;All Files (*)"
+            )
+
+            if file_path:
+                with open(file_path, 'wb') as f:
+                    f.write(pdf_data.data())
+                print(f"PDF saved to: {file_path}")
+
+        except Exception as e:
+            print(f"Error saving PDF: {e}")
 
 class DevToolsWindow(QMainWindow):
     def __init__(self, parent: typing.Optional[QWidget] = None) -> None:
@@ -207,9 +236,7 @@ class BrowserTab(QWidget):
 
         # Create a QWebEngineView and set up its own thread
         self.browser = QWebEngineView()
-        #self.browser_thread = QThread()  # New thread for asynchronous loading
-        #self.browser.moveToThread(self.browser_thread)
-        #self.browser_thread.start()  # Start the thread
+        self.browser.page().profile().downloadRequested.connect(self.handle_download_requested)
 
         self.browser.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
         self.browser.page().loadFinished.connect(self.on_load_finished)
@@ -218,13 +245,11 @@ class BrowserTab(QWidget):
         self.layout.addWidget(self.browser)
         self.setLayout(self.layout)
 
-        #self.load_async_content = partial(self.browser.setUrl, QUrl(url))
-        #QTimer.singleShot(0, self.load_async_content)
         self.browser.setUrl(QUrl(url))
 
     @pyqtSlot(bool)
     def on_load_finished(self, ok: bool) -> None:
-        if (ok):
+        if ok:
             self.content_loaded.emit(self.browser.url().toString())
         else:
             print(f"Failed to load {self.browser.url().toString()}")
@@ -253,6 +278,30 @@ class BrowserTab(QWidget):
         """
         self.browser.page().runJavaScript(script)
 
+    def handle_download_requested(self, download: QWebEngineDownloadRequest) -> None:
+        # Skip if it's a PDF being handled by CodeExecutor
+        if download.mimeType() == "application/pdf" and "data:application/pdf" in download.url().toString():
+            download.cancel()
+            return
+
+        if not download.isFinished():
+            settings = QSettings(SETTINGS_ORG, SETTINGS_APP)
+            last_directory = settings.value("lastDownloadDirectory", "")
+            suggested_filename = download.suggestedFileName()
+            file_path, _ = QFileDialog.getSaveFileName(
+                self,
+                "Save File",
+                os.path.join(last_directory, suggested_filename),
+                "All Files (*)"
+            )
+            if file_path:
+                download.setDownloadDirectory(os.path.dirname(file_path))
+                download.setDownloadFileName(os.path.basename(file_path))
+                settings.setValue("lastDownloadDirectory", os.path.dirname(file_path))
+                download.accept()
+                print(f"Download started: {file_path}")
+            else:
+                download.cancel()
 
 class Browser(QMainWindow):
     def __init__(self) -> None:
