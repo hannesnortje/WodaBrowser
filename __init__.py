@@ -1,1 +1,1 @@
-# This file can be empty or contain package initialization code
+# This file is intentionally left blank to mark the directory as a package.
