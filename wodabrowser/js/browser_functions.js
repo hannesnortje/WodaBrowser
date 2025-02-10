@@ -50,6 +50,21 @@
                 });
             };
 
+            window.browserAPI = {
+                openNewTab: function(url) {
+                    if (typeof window.codeExecutor !== 'undefined') {
+                        window.codeExecutor.executeSignal(url);
+                    }
+                },
+                
+                readFile: function(filePath, callback) {
+                    window.readFileCallback = callback;
+                    if (typeof window.fileSystemHandler !== 'undefined') {
+                        window.fileSystemHandler.readFile(filePath);
+                    }
+                }
+            };
+
             console.log('File system functions initialized and attached to window object');
         });
     }

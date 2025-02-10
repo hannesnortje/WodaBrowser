@@ -11,7 +11,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "wodabrowser=wodabrowser.browser:main",
+            "wodabrowser=wodabrowser:main",  # Changed from wodabrowser.browser:main
         ],
     },
     include_package_data=True,

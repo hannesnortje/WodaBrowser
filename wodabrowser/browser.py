@@ -76,7 +76,10 @@ from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 from collections import defaultdict
 import typing
 import os
-from file_system_handler import FileSystemHandler
+try:
+    from .file_system_handler import FileSystemHandler
+except ImportError:
+    from file_system_handler import FileSystemHandler
 from functools import partial
 
 # Constants
