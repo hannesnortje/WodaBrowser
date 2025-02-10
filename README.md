@@ -135,7 +135,7 @@ pipx install --force git+https://github.com/hannesnortje/WodaBrowser.git
 Once installed, run the Woda Browser with the following command:
 
 ```bash
-woda-browser
+wodabrowser
 ```
 
 The browser will launch with the Woda platform’s custom features.
