@@ -5,21 +5,19 @@ The Woda Browser is a custom-built browser leveraging PyQt6, designed for enhanc
 ## Table of Contents
 1. [Requirements](#requirements)
 2. [Installation](#installation)
-   - [Install Python 3](#install-python-3)
-   - [Install `pipx`](#install-pipx)
-   - [Install Woda Browser](#install-woda-browser)
 3. [Usage](#usage)
-4. [Troubleshooting](#troubleshooting)
-5. [License](#license)
+4. [Licensing](#licensing)
+5. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Requirements
 
-- **Python 3.7 or higher** is required. Check your Python version with:
-  ```bash
-  python3 --version
-  ```
+- **Python 3.8 or higher**
+- **Qt6 Open Source Version** (automatically installed with PyQt6)
+  - The browser uses Qt6 under LGPL v3
+  - PyQt6 components are automatically installed via pip
+  - No commercial Qt license is required for use
 
 ## Installation
 
@@ -139,6 +137,18 @@ wodabrowser
 ```
 
 The browser will launch with the Woda platform’s custom features.
+
+---
+
+## Licensing
+
+This software is distributed under multiple licenses:
+
+- **Browser Code**: GNU Affero General Public License v3 (AGPL-3.0)
+- **Qt6 Components**: LGPL v3 (GNU Lesser General Public License version 3)
+- **PyQt6**: GPL v3 (GNU General Public License version 3)
+
+The use of Qt6 in this project is compliant with the open-source licensing terms of Qt and does not require a commercial Qt license for use or distribution.
 
 ---
 
