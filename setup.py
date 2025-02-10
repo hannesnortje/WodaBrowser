@@ -27,12 +27,22 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "PyQt6",
-        "PyQt6-WebEngine",
+        "PyQt6>=6.4.0",
+        "PyQt6-WebEngine>=6.4.0",
+        "PyQt6-Qt6>=6.4.0",
+        "PyQt6-sip>=13.4.0",
+        "packaging>=23.0",
+        "QtPy>=2.3.0",  # Added for better Qt compatibility
+        "setuptools>=65.5.1",  # Ensure proper installation
+        "wheel>=0.38.0",  # Required for proper package building
+    ],
+    setup_requires=[
+        "wheel>=0.38.0",
+        "setuptools>=65.5.1",
     ],
     entry_points={
         "console_scripts": [
-            "wodabrowser=wodabrowser:main",  # Changed from wodabrowser.browser:main
+            "wodabrowser=wodabrowser.browser:main",  # Updated entry point
         ],
     },
     include_package_data=True,
@@ -41,11 +51,17 @@ setup(
             "js/*.js",
             "github-mark.svg",
             "icons/*.svg",
+            "icons/*.desktop",
         ],
     },
     data_files=get_data_files(),
     zip_safe=False,  # Required for PyQt6 applications
     python_requires=">=3.8",
+    options={
+        'bdist_wheel': {
+            'py_limited_api': 'cp38',  # Ensure wheel compatibility
+        },
+    },
     author="Hannes Nortjé",
     description="A PyQt6-based web browser",
     long_description=open("README.md").read(),

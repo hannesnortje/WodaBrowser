@@ -1,0 +1,21 @@
+[build-system]
+requires = [
+    "setuptools>=65.5.1",
+    "wheel>=0.38.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wodabrowser"
+dynamic = ["version"]
+dependencies = [
+    "PyQt6>=6.4.0",
+    "PyQt6-WebEngine>=6.4.0",
+    "PyQt6-Qt6>=6.4.0",
+    "PyQt6-sip>=13.4.0",
+    "packaging>=23.0",
+    "QtPy>=2.3.0",
+]
+
+[tool.setuptools]
+packages = ["wodabrowser"]
