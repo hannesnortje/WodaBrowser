@@ -239,44 +239,66 @@ class BrowserTab(QWidget):
         self.browser.page().profile().downloadRequested.connect(self.handle_download_requested)
 
         self.browser.setContextMenuPolicy(Qt.ContextMenuPolicy.NoContextMenu)
-        self.browser.page().loadFinished.connect(self.on_load_finished)
-        self.browser.page().loadFinished.connect(self.inject_scripts)
+        
+        # Make sure signal connections are done before loading URL
+        self.browser.loadFinished.connect(self._on_load_finished)
 
         self.layout.addWidget(self.browser)
         self.setLayout(self.layout)
 
-        self.browser.setUrl(QUrl(url))
+        # Load the URL after everything is set up
+        self._load_url(url)
+
+    def _load_url(self, url: str) -> None:
+        """Helper method to load URLs safely."""
+        try:
+            self.browser.setUrl(QUrl(url))
+        except Exception as e:
+            print(f"Error loading URL {url}: {e}")
+            self.browser.setHtml("<html><body><h1>Error loading page</h1></body></html>")
 
     @pyqtSlot(bool)
-    def on_load_finished(self, ok: bool) -> None:
+    def _on_load_finished(self, ok: bool) -> None:
+        """Internal handler for loadFinished signal."""
         if ok:
             self.content_loaded.emit(self.browser.url().toString())
+            self.inject_scripts(ok)  # Call inject_scripts directly
         else:
             print(f"Failed to load {self.browser.url().toString()}")
+            self.browser.setHtml("<html><body><h1>Failed to load page</h1></body></html>")
 
+    @pyqtSlot(bool)
     def inject_scripts(self, ok: bool) -> None:
+        """Inject required JavaScript into the page."""
         if not ok:
             return
 
-        # Load qwebchannel.js from file
-        qwebchannel_js_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "qwebchannel.js")
-        with open(qwebchannel_js_path, 'r') as file:
-            qwebchannel_js = file.read()
+        try:
+            # Load qwebchannel.js from file
+            qwebchannel_js_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "qwebchannel.js")
+            with open(qwebchannel_js_path, 'r') as file:
+                qwebchannel_js = file.read()
 
-        # Load browser functions JavaScript code from file
-        browser_functions_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "browser_functions.js")
-        with open(browser_functions_path, 'r') as file:
-            browser_functions_js = file.read()
+            # Load browser functions JavaScript code from file
+            browser_functions_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "js", "browser_functions.js")
+            with open(browser_functions_path, 'r') as file:
+                browser_functions_js = file.read()
 
-        # Inject both scripts
-        script = f"""
-            // Inject QWebChannel.js
-            {qwebchannel_js}
-            
-            // Inject browser functions
-            {browser_functions_js}
-        """
-        self.browser.page().runJavaScript(script)
+            # Inject both scripts
+            script = f"""
+                // Inject QWebChannel.js
+                {qwebchannel_js}
+                
+                // Inject browser functions
+                {browser_functions_js}
+            """
+            self.browser.page().runJavaScript(script, self._check_injection)
+        except Exception as e:
+            print(f"Error injecting JavaScript: {e}")
+
+    def _check_injection(self, result):
+        """Callback to verify JavaScript injection."""
+        print(f"JavaScript injection completed: {result}")
 
     def handle_download_requested(self, download: QWebEngineDownloadRequest) -> None:
         # Skip if it's a PDF being handled by CodeExecutor
@@ -483,11 +505,17 @@ class Browser(QMainWindow):
             self.back_action.setEnabled(False)
             self.forward_action.setEnabled(False)
 
-    def navigate_to_url(self) -> None:
-        url_text = self.url_bar.text()
+    def sanitize_url(self, url_text: str) -> QUrl:
+        """Sanitize and format URLs properly."""
         url = QUrl(url_text)
         if url.scheme() == "":
-            url.setScheme("http")
+            # Add proper double slashes after scheme for consistency
+            url = QUrl("http://" + url_text)
+        return url
+
+    def navigate_to_url(self) -> None:
+        url_text = self.url_bar.text()
+        url = self.sanitize_url(url_text)
         if self.current_browser():
             self.current_browser().setUrl(url)
 

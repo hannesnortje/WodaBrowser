@@ -27,9 +27,8 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=[
-        "PyQt6>=6.4.0",
-        "PyQt6-WebEngine>=6.4.0",
-        "PyQt6-Qt6>=6.4.0",
+        "PyQt6",
+        "PyQt6-WebEngine",
     ],
     entry_points={
         "console_scripts": [
