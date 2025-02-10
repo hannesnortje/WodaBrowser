@@ -41,8 +41,7 @@ setup(
         "wodabrowser": [
             "js/*.js",
             "github-mark.svg",
-            "icons/*.*",
-            "icons/wodabrowser.iconset/*",
+            "icons/*.svg",
         ],
     },
     data_files=get_data_files(),
