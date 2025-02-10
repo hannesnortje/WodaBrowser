@@ -338,12 +338,12 @@ class Browser(QMainWindow):
         github_icon_path = os.path.join(os.path.dirname(__file__), "github-mark.svg")
         try:
             github_action = QAction(QIcon(github_icon_path), "GitHub", self)
-            github_action.triggered.connect(lambda: self.add_new_tab(QUrl("https://github.com/Cerulean-Circle-GmbH"), "GitHub"))
+            github_action.triggered.connect(lambda: self.add_new_tab(QUrl("https://github.com/hannesnortje/WodaBrowser"), "GitHub"))
             nav_bar.addAction(github_action)
         except Exception as e:
             print(f"Error loading GitHub icon: {e}")
             github_action = QAction("GitHub", self)  # Fallback
-            github_action.triggered.connect(lambda: self.add_new_tab(QUrl("https://github.com/Cerulean-Circle-GmbH"), "GitHub"))
+            github_action.triggered.connect(lambda: self.add_new_tab(QUrl("https://github.com/hannesnortje/WodaBrowser"), "GitHub"))
             nav_bar.addAction(github_action)
 
         three_dot_menu = QMenu("More", self)

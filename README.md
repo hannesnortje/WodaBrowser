@@ -1,6 +1,6 @@
 # Woda Browser
 
-The Woda Browser is a custom-built browser leveraging PyQt6, designed for enhanced functionality within the Web 4.0 ™ platform. This browser includes JavaScript injection, developer tools, and more, and is distributed under the AGPL-3.0 license.
+The Woda Browser is a custom-built browser leveraging PyQt6, designed for enhanced functionality within the Woda ™ platform. This browser includes JavaScript injection, developer tools, and more, and is distributed under the AGPL-3.0 license.
 
 ## Table of Contents
 1. [Requirements](#requirements)
