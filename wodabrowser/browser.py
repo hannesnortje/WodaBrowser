@@ -769,12 +769,13 @@ class Browser(QMainWindow):
     @pyqtSlot(str, str)
     def handle_file_read(self, filePath: str, content: str) -> None:
         print(f"File {filePath} read successfully. Content: {content}")
-        # You can add logic here to pass the content back to the web page, e.g., using runJavaScript
+        # Pass the content back to the web page using runJavaScript
         script = f"""
             (function(filePath, content) {{
-                let event = new CustomEvent('fileRead', {{ detail: {{ filePath: filePath, content: content }} }});
-                document.dispatchEvent(event);
-            }})('{filePath}', '{content}');
+                if (window.readFileCallback) {{
+                    window.readFileCallback(content);
+                }}
+            }})('{filePath}', `{content}`);
         """
         self.current_browser().page().runJavaScript(script)
 
