@@ -53,10 +53,14 @@
             window.executePython = function(code) {
                 console.log('executePython called', code);
                 return new Promise((resolve, reject) => {
-                    window.codeExecutor.codeResultReady.connect((result) => {
-                        resolve(result);
-                    });
-                    window.codeExecutor.executeSignal({type: 'executePython', code: code});
+                    if (window.codeExecutor && window.codeExecutor.codeResultReady) {
+                        window.codeExecutor.codeResultReady.connect((result) => {
+                            resolve(result);
+                        });
+                        window.codeExecutor.executeSignal({type: 'executePython', code: code});
+                    } else {
+                        reject(new Error("codeExecutor or codeResultReady is not defined"));
+                    }
                 });
             };
 

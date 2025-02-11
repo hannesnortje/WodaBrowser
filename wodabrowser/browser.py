@@ -182,6 +182,7 @@ class CodeExecutor(QObject):
         finally:
             output.close()
 
+        print("Execution result:", result)  # Add debugging information
         self.codeResultReady.emit(result)
 
 class DevToolsWindow(QMainWindow):
