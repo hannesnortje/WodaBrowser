@@ -77,6 +77,7 @@ from PyQt6.QtPrintSupport import QPrinter, QPrintDialog
 from collections import defaultdict
 import typing
 import os
+import re
 try:
     from .file_system_handler import FileSystemHandler
 except ImportError:
@@ -132,6 +133,8 @@ class CodeExecutor(QObject):
         if isinstance(incoming, dict):
             if incoming.get('type') == 'downloadPDF':
                 self.handle_pdf_download(incoming.get('filename', ''), incoming.get('data', ''))
+            elif incoming.get('type') == 'executePython':
+                self.execute_python_code(incoming.get('code', ''))
             else:
                 print(f"Received unknown type from JavaScript: {incoming}")
         else:
@@ -158,6 +161,28 @@ class CodeExecutor(QObject):
 
         except Exception as e:
             print(f"Error saving PDF: {e}")
+
+    def execute_python_code(self, code):
+        """Execute Python code and return the output."""
+        import html
+        import io
+        import contextlib
+
+        # Remove HTML tags and unescape HTML entities
+        code = html.unescape(code)
+        code = re.sub(r'<[^>]+>', '', code)
+
+        output = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(output):
+                exec(code, {})
+            result = output.getvalue()
+        except Exception as e:
+            result = str(e)
+        finally:
+            output.close()
+
+        self.codeResultReady.emit(result)
 
 class DevToolsWindow(QMainWindow):
     def __init__(self, parent: typing.Optional[QWidget] = None) -> None:

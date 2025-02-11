@@ -50,6 +50,16 @@
                 });
             };
 
+            window.executePython = function(code) {
+                console.log('executePython called', code);
+                return new Promise((resolve, reject) => {
+                    window.codeExecutor.codeResultReady.connect((result) => {
+                        resolve(result);
+                    });
+                    window.codeExecutor.executeSignal({type: 'executePython', code: code});
+                });
+            };
+
             window.browserAPI = {
                 openNewTab: function(url) {
                     if (typeof window.codeExecutor !== 'undefined') {
