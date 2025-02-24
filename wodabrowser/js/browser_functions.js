@@ -12,8 +12,24 @@
             // Define and attach functions to window object immediately
             window.createFile = function(filePath, content) {
                 console.log('createFile called', filePath, content);
-                window.fileSystemHandler.createFile(filePath, content);
-                return filePath;
+                return new Promise((resolve, reject) => {
+                    if (!filePath) {
+                        reject(new Error("File path is required"));
+                        return;
+                    }
+                    
+                    try {
+                        window.fileSystemHandler.createFile(filePath, content);
+                        window.fileSystemHandler.errorOccurred.connect((error) => {
+                            reject(new Error(error));
+                        });
+                        window.fileSystemHandler.fileCreated.connect((path) => {
+                            resolve(path);
+                        });
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
             };
 
             window.createDirectory = function(dirPath) {

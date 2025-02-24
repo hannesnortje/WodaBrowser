@@ -21,11 +21,22 @@ class FileSystemHandler(QObject):
     def createFile(self, filePath, content):
         full_path = os.path.join(self.base_path, filePath)
         try:
+            # Check if directory exists
+            directory = os.path.dirname(full_path)
+            if not os.path.exists(directory):
+                raise FileNotFoundError(f"Directory {directory} does not exist")
+
+            # Check if file already exists
+            if os.path.exists(full_path):
+                raise FileExistsError(f"File {filePath} already exists")
+
             with open(full_path, 'w') as f:
                 f.write(content)
             self.fileCreated.emit(filePath)
         except Exception as e:
-            self.errorOccurred.emit(str(e))
+            error_msg = f"Error creating file {filePath}: {str(e)}"
+            print(error_msg)
+            self.errorOccurred.emit(error_msg)
 
     @pyqtSlot(str)
     def createDirectory(self, dirPath):
