@@ -1,4 +1,3 @@
-
 /**
  * Signal debugging and patching utility for WodaBrowser.
  * This script provides manual signal connection capabilities when normal
@@ -58,23 +57,25 @@
         // List of signals to patch
         const signals = [
             'fileRead', 'fileCreated', 'fileChanged', 'fileDeleted',
-            'directoryCreated', 'directoryDeleted', 'errorOccurred'
+            'directoryCreated', 'directoryDeleted', 'directoryListed', 'errorOccurred'
         ];
         
         // Create fake signal objects
         signals.forEach(signalName => {
-            // Create a signal object if it doesn't exist
-            if (!handler[signalName]) {
-                handler[signalName] = {
-                    connect: function(callback) {
-                        console.log(`Connecting callback to ${signalName}`);
-                        return window._signalSystem.registerCallback(signalName, callback);
+            if (signalName === 'directoryListed' || typeof handler[signalName] !== 'object') {
+                Object.defineProperty(handler, signalName, {
+                    value: {
+                        connect: function(callback) {
+                            return window._signalSystem.registerCallback(signalName, callback);
+                        },
+                        disconnect: function(callback) {
+                            window._signalSystem.removeCallback(signalName, callback);
+                        }
                     },
-                    disconnect: function(callback) {
-                        console.log(`Disconnecting callback from ${signalName}`);
-                        window._signalSystem.removeCallback(signalName, callback);
-                    }
-                };
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                });
             }
         });
         

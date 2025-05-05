@@ -1,4 +1,3 @@
-
 // Inject this patch before the main browser_functions.js script
 (function() {
     /**
@@ -14,44 +13,32 @@
         // Fix missing signals
         const signalNames = [
             'fileRead', 'fileCreated', 'fileChanged', 'fileDeleted',
-            'directoryCreated', 'directoryDeleted', 'errorOccurred'
+            'directoryCreated', 'directoryDeleted', 'directoryListed', 'errorOccurred'
         ];
         
         signalNames.forEach(signalName => {
-            if (typeof handler[signalName] === 'undefined') {
-                console.log(`Creating proxy signal for ${signalName}`);
-                
-                // Create a signal object
-                handler[signalName] = {
-                    _callbacks: [],
-                    
-                    connect: function(callback) {
-                        console.log(`Connecting callback to ${signalName}`);
-                        this._callbacks.push(callback);
-                        return true;
-                    },
-                    
-                    disconnect: function(callback) {
-                        console.log(`Disconnecting callback from ${signalName}`);
-                        const index = this._callbacks.indexOf(callback);
-                        if (index !== -1) {
-                            this._callbacks.splice(index, 1);
+            if (signalName === 'directoryListed' || typeof handler[signalName] !== 'object') {
+                console.log(`Forcefully creating proxy signal for ${signalName}`);
+                Object.defineProperty(handler, signalName, {
+                    value: {
+                        _callbacks: [],
+                        connect: function(callback) {
+                            this._callbacks.push(callback);
                             return true;
+                        },
+                        disconnect: function(callback) {
+                            const idx = this._callbacks.indexOf(callback);
+                            if (idx !== -1) this._callbacks.splice(idx, 1);
+                            return true;
+                        },
+                        emit: function(...args) {
+                            this._callbacks.forEach(cb => { try { cb(...args); } catch(e) {} });
                         }
-                        return false;
                     },
-                    
-                    emit: function(...args) {
-                        console.log(`Emitting ${signalName} with args:`, args);
-                        this._callbacks.forEach(cb => {
-                            try {
-                                cb(...args);
-                            } catch (e) {
-                                console.error("Error in signal callback:", e);
-                            }
-                        });
-                    }
-                };
+                    writable: true,
+                    configurable: true,
+                    enumerable: true
+                });
                 
                 // If signal handler exists for this signal
                 const handlerId = `${handler.__id__}_${signalName}`;

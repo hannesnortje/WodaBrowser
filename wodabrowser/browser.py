@@ -89,7 +89,7 @@ from PyQt6.QtWebEngineCore import QWebEngineProfile, QWebEngineDownloadRequest
 
 # Constants
 MAX_HISTORY_LENGTH = 100
-DEFAULT_URL = "https://test.wo-da.de/ide"
+DEFAULT_URL = "file://" + os.path.abspath(os.path.join(os.path.dirname(__file__), "html/index.html"))
 BROWSER_TITLE = "Woda Browser"
 SETTINGS_ORG = "CeruleanCircle"
 SETTINGS_APP = "WodaBrowser"
@@ -279,7 +279,7 @@ class BrowserTab(QWidget):
     @pyqtSlot(bool)
     def _on_load_finished(self, ok: bool) -> None:
         """Internal handler for loadFinished signal."""
-        if ok:
+        if (ok):
             self.content_loaded.emit(self.browser.url().toString())
             self.inject_scripts(ok)  # Call inject_scripts directly
         else:
@@ -649,6 +649,10 @@ class Browser(QMainWindow):
             
             # Set web channel before connecting signals
             page.setWebChannel(self.channel)
+            
+            # Set the browser page reference in file_system_handler
+            if hasattr(self, 'file_system_handler') and self.file_system_handler:
+                self.file_system_handler.browser_page = page
             
             # Connect tab signals
             new_tab.browser.titleChanged.connect(

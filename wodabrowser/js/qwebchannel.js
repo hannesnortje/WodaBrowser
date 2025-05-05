@@ -144,8 +144,13 @@ var QWebChannel = function(transport, initCallback)
             console.error("Invalid response message received: ", JSON.stringify(message));
             return;
         }
-        channel.execCallbacks[message.id](message.data);
-        delete channel.execCallbacks[message.id];
+        if (typeof channel.execCallbacks[message.id] === 'function') {
+            channel.execCallbacks[message.id](message.data);
+            delete channel.execCallbacks[message.id];
+        } else {
+            // Added error handling for missing callbacks
+            console.debug("QWebChannel: Missing callback for message ID: " + message.id);
+        }
     }
 
     this.handlePropertyUpdate = function(message)

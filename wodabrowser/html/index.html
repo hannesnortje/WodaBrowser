@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nautilus-like File Explorer (Static Demo)</title>
+    <link rel="stylesheet" href="nautilus.css">
+    <style>
+        /* Notification styles */
+        #notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+        }
+        #notification.show {
+            opacity: 1;
+        }
+        #notification.error {
+            background-color: #d9534f;
+        }
+        
+        /* Drop zone styles */
+        .file-area.drop-active {
+            background-color: rgba(0, 120, 215, 0.1);
+            border: 2px dashed #0078d7;
+        }
+        
+        /* File upload progress */
+        #upload-progress {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: #333;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+        
+        #progress-bar {
+            width: 100%;
+            background-color: #555;
+            height: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        #progress-bar-inner {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="nautilus-container">
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Places</div>
+                <ul>
+                    <li class="active"><span class="icon folder"></span> Home</li>
+                    <li><span class="icon folder"></span> Desktop</li>
+                    <li><span class="icon folder"></span> Documents</li>
+                    <li><span class="icon folder"></span> Downloads</li>
+                    <li><span class="icon folder"></span> Pictures</li>
+                    <li><span class="icon folder"></span> Music</li>
+                    <li><span class="icon folder"></span> Videos</li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Devices</div>
+                <ul>
+                    <li><span class="icon drive"></span> File System</li>
+                </ul>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title">Network</div>
+                <ul>
+                    <li><span class="icon network"></span> Browse Network</li>
+                </ul>
+            </div>
+        </aside>
+        <main class="main-area">
+            <header class="toolbar">
+                <button class="nav-btn" title="Back">&#8592;</button>
+                <button class="nav-btn" title="Forward">&#8594;</button>
+                <button class="nav-btn" title="Up">&#8593;</button>
+                <nav class="breadcrumb">
+                    <span class="crumb active">Home</span>
+                </nav>
+                <input class="search" type="text" placeholder="Search...">
+                <button class="view-toggle" id="toggleView" title="Toggle View">&#9776;</button>
+            </header>
+            <section class="file-area grid-view" id="fileArea">
+                <!-- File/folder items will be rendered dynamically by nautilus.js -->
+            </section>
+            <footer class="status-bar">
+                <span>8 items, Free space: 100 GB</span>
+            </footer>
+        </main>
+    </div>
+    
+    <!-- Notification element -->
+    <div id="notification"></div>
+
+    <!-- Upload progress element -->
+    <div id="upload-progress">
+        <span>Uploading...</span>
+        <div id="progress-bar">
+            <div id="progress-bar-inner"></div>
+        </div>
+    </div>
+
+    <script>
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = type === 'error' ? 'error show' : 'show';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                notification.className = '';
+            }, 3000);
+        }
+    </script>
+    <script src="nautilus.js"></script>
+</body>
+</html>
